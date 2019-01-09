@@ -47,13 +47,14 @@ void MaxCircleInContour(const vector<cv::Point>& contour, const Mat&  _imgBin, c
 //mean为均值，pc_orinet为主成分的指向，sc_orient为次成份的指向
 void apply_pca(const vector<cv::Point>& pointset, Point& mean, Point& pc_orinet, Point& sc_orient)
 {
-	int sz = static_cast<int>(pointset.size());
-	Mat pts_mat = Mat(sz, 2, CV_64FC1);         /*将输入的vector转换为一个Mat，Mat的每行为一个点*/
-	for (int i = 0; i < pts_mat.rows; ++i)
-	{
-		*((double*)(pts_mat.data + i*pts_mat.step[0] + 0 * pts_mat.step[1])) = pointset[i].x;
-		*((double*)(pts_mat.data + i*pts_mat.step[0] + 1 * pts_mat.step[1])) = pointset[i].y;
-	}
+	int len = static_cast<int>(pointset.size());
+	Mat pts_mat;   //将输入的vector转换为一个CV_64FC1的len行2列的Mat，Mat的每行为一个点//
+	Mat ma(pointset);
+	assert(ma.size() == cv::Size(1, len) && ma.type() == CV_32SC2);
+	Mat mb(len, 2, CV_32SC1, ma.data);
+	mb.convertTo(pts_mat, CV_64FC1);
+	assert(pts_mat.size() == cv::Size(2, len) && pts_mat.type() == CV_64FC1);
+
 
 	//第2个参数， InputArray mean，平均值，如果矩阵是空的（noArray()），则从数据计算；
 	//CV_PCA_DATA_AS_ROW表示输入矩阵的每一行表示一个样本
